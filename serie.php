@@ -1,37 +1,27 @@
 <?php
 $autor = "Jhon Robert Paitan Montes";
 
-$num1 = $num2 = $resultado = $error = null;
-$serie = [];
+$num1 = $num2 = $num3 = $suma = $error = null;
+$promedio = $mayor = $menor = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $num1 = trim($_POST['num1'] ?? '');
     $num2 = trim($_POST['num2'] ?? '');
+    $num3 = trim($_POST['num3'] ?? '');
 
-    if ($num1 === '' || $num2 === '') {
-        $error = "Por favor ingresa ambos números.";
-    } elseif (!is_numeric($num1) || !is_numeric($num2)) {
-        $error = "Ambos valores deben ser números válidos.";
+    if ($num1 === '' || $num2 === '' || $num3 === '') {
+        $error = "Por favor ingresa los tres números.";
+    } elseif (!is_numeric($num1) || !is_numeric($num2) || !is_numeric($num3)) {
+        $error = "Los tres valores deben ser números válidos.";
     } else {
         $num1 = (float)$num1;
         $num2 = (float)$num2;
+        $num3 = (float)$num3;
 
-        // Genera la serie entre num1 y num2
-        if ($num1 == $num2) {
-            $serie = [$num1];
-        } elseif ($num1 < $num2) {
-            for ($i = $num1; $i <= $num2; $i++) {
-                $serie[] = $i;
-            }
-        } else {
-            for ($i = $num1; $i >= $num2; $i--) {
-                $serie[] = $i;
-            }
-        }
-
-        $diferencia = abs($num2 - $num1);
-        $suma = array_sum($serie);
-        $cantidad = count($serie);
+        $suma     = $num1 + $num2 + $num3;
+        $promedio = $suma / 3;
+        $mayor    = max($num1, $num2, $num3);
+        $menor    = min($num1, $num2, $num3);
     }
 }
 ?>
@@ -40,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Serie de Números — Proyecto PHP</title>
+  <title>Suma de Tres Números — Proyecto PHP</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -226,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 1px;
       background: var(--border);
       border: 1px solid var(--border);
@@ -255,41 +245,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       color: var(--accent);
     }
 
-    .serie-container {
+    /* EQUATION BOX */
+    .equation-box {
       background: var(--surface);
       border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2);
       border-radius: 4px;
-      padding: 1.5rem;
-    }
-
-    .serie-label {
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 1rem;
-    }
-
-    .serie-nums {
+      padding: 1.5rem 2rem;
       display: flex;
+      align-items: center;
+      gap: 1rem;
       flex-wrap: wrap;
-      gap: 0.5rem;
     }
 
-    .serie-num {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      padding: 0.35rem 0.75rem;
-      font-size: 0.85rem;
+    .eq-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
       color: var(--text);
-      transition: all .15s;
     }
 
-    .serie-num:first-child,
-    .serie-num:last-child {
-      border-color: var(--accent2);
+    .eq-op {
+      font-size: 1.5rem;
+      color: var(--muted);
+    }
+
+    .eq-eq {
+      font-size: 1.5rem;
       color: var(--accent2);
+    }
+
+    .eq-result {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
     }
 
     footer {
@@ -315,10 +305,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <main>
   <div class="page-tag">01 / Módulo</div>
-  <h1>Serie de Dos Números</h1>
+  <h1>Suma de Tres Números</h1>
   <p class="subtitle">
-    Ingresa dos números enteros y el sistema generará la serie completa<br>
-    entre ellos, mostrando estadísticas del resultado.
+    Ingresa tres números y el sistema calculará su suma total,<br>
+    promedio, mayor y menor valor de forma instantánea.
   </p>
 
   <?php if ($error): ?>
@@ -326,56 +316,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 
   <form method="POST" action="serie.php">
-    <div class="form-row">
+    <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
       <div class="field">
-        <label>Número Inicial</label>
-        <input type="number" name="num1" placeholder="Ej: 1"
+        <label>Primer Número</label>
+        <input type="number" step="any" name="num1" placeholder="Ej: 5"
                value="<?php echo htmlspecialchars($num1 ?? ''); ?>" required>
       </div>
       <div class="field">
-        <label>Número Final</label>
-        <input type="number" name="num2" placeholder="Ej: 10"
+        <label>Segundo Número</label>
+        <input type="number" step="any" name="num2" placeholder="Ej: 12"
                value="<?php echo htmlspecialchars($num2 ?? ''); ?>" required>
       </div>
+      <div class="field">
+        <label>Tercer Número</label>
+        <input type="number" step="any" name="num3" placeholder="Ej: 8"
+               value="<?php echo htmlspecialchars($num3 ?? ''); ?>" required>
+      </div>
     </div>
-    <button type="submit">&#9654; Generar Serie</button>
+    <button type="submit">&#9654; Calcular Suma</button>
   </form>
 
-  <?php if (!empty($serie)): ?>
+  <?php if ($suma !== null): ?>
   <div class="result-block">
     <div class="stats-grid">
       <div class="stat">
-        <div class="stat-label">Términos</div>
-        <div class="stat-value"><?php echo $cantidad; ?></div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Diferencia</div>
-        <div class="stat-value"><?php echo $diferencia; ?></div>
-      </div>
-      <div class="stat">
         <div class="stat-label">Suma Total</div>
-        <div class="stat-value"><?php echo $suma; ?></div>
+        <div class="stat-value"><?php echo number_format($suma, 2); ?></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Promedio</div>
+        <div class="stat-value"><?php echo number_format($promedio, 2); ?></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Mayor</div>
+        <div class="stat-value"><?php echo number_format($mayor, 2); ?></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Menor</div>
+        <div class="stat-value"><?php echo number_format($menor, 2); ?></div>
       </div>
     </div>
 
-    <div class="serie-container">
-      <div class="serie-label">
-        Serie de <?php echo number_format($num1); ?> a <?php echo number_format($num2); ?>
-        <?php if($cantidad > 50): ?>
-          &mdash; mostrando primeros 50 de <?php echo $cantidad; ?>
-        <?php endif; ?>
-      </div>
-      <div class="serie-nums">
-        <?php
-          $mostrar = array_slice($serie, 0, 50);
-          foreach ($mostrar as $n):
-        ?>
-          <span class="serie-num"><?php echo $n; ?></span>
-        <?php endforeach; ?>
-        <?php if ($cantidad > 50): ?>
-          <span class="serie-num" style="color:var(--muted);">+<?php echo $cantidad - 50; ?> más...</span>
-        <?php endif; ?>
-      </div>
+    <div class="equation-box">
+      <span class="eq-num"><?php echo number_format($num1, 2); ?></span>
+      <span class="eq-op">+</span>
+      <span class="eq-num"><?php echo number_format($num2, 2); ?></span>
+      <span class="eq-op">+</span>
+      <span class="eq-num"><?php echo number_format($num3, 2); ?></span>
+      <span class="eq-eq">=</span>
+      <span class="eq-result"><?php echo number_format($suma, 2); ?></span>
     </div>
   </div>
   <?php endif; ?>
@@ -383,7 +372,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <footer>
   <span><?php echo htmlspecialchars($autor); ?></span>
-  <span>Módulo: Serie de Números</span>
+  <span>Módulo: Suma de Tres Números</span>
 </footer>
 
 </body>
